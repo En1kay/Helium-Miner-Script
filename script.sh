@@ -24,20 +24,20 @@ mkdir /home/keys
 wg genkey | sudo tee /home/keys/client_private.key | wg pubkey | sudo tee /home/keys/client_public.key
 sudo chmod 600 /home/keys/client_private.key
 
-sudo echo "[INTERFACE]\nPrivateKey = " > /etc/wireguard/wg0.conf
+sudo printf "[INTERFACE]\nPrivateKey = " > /etc/wireguard/wg0.conf
 sudo cat /etc/wireguard/server_private.key >> /etc/wireguard/wg0.conf
-sudo echo "\nAddress = 10.5.5.1\nListenPort = 61951\n[Peer]\nPublicKey = " >> /etc/wireguard/wg0.conf
+sudo printf "Address = 10.5.5.1\nListenPort = 61951\n\n[Peer]\nPublicKey = " >> /etc/wireguard/wg0.conf
 sudo cat /home/keys/client_public.key >> /etc/wireguard/wg0.conf
-sudo echo "\nAllowedIPs = 10.5.5.2/32" >> /etc/wireguard/wg0.conf
+sudo printf "AllowedIPs = 10.5.5.2/32" >> /etc/wireguard/wg0.conf
 
 sudo systemctl start wg-quick@wg0
 sudo systemctl enable wg-quick@wg0
 
-sudo echo "[INTERFACE]\nPrivateKey = " > /home/keys/wg0.conf
+sudo printf "[INTERFACE]\nPrivateKey = " > /home/keys/wg0.conf
 sudo cat /home/keys/client_private.key >> /home/keys/wg0.conf
-sudo echo "\nAddress = 10.5.5.2\nListenPort = 61951\n[Peer]\nPublicKey = " >> /home/keys/wg0.conf
+sudo printf "Address = 10.5.5.2\nListenPort = 61951\n\n[Peer]\nPublicKey = " >> /home/keys/wg0.conf
 sudo cat /etc/wireguard/server_public.key >> /home/keys/wg0.conf
-sudo echo "\nAllowedIPs = 0.0.0.0/0\nEndpoint = $IP:61951\nPersistentKeepalive = 25" >> /home/keys/wg0.conf
+sudo printf "AllowedIPs = 0.0.0.0/0\nEndpoint = $IP:61951\nPersistentKeepalive = 25" >> /home/keys/wg0.conf
 
 sudo iptables -P FORWARD DROP
 sudo iptables -A FORWARD -i $interface -o wg0 -p tcp --syn --dport 44158 -m conntrack --ctstate NEW -j ACCEPT
